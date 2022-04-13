@@ -1,4 +1,4 @@
-import random
+from random import choice
 
 def get_words():
     words = []
@@ -7,11 +7,21 @@ def get_words():
     return words
 
 def get_random_word():
-    word = random.choice(get_words())
+    word = choice(get_words())
     return word
 
+def generate_scene(word):
+    title = "¡Adivina la palabra!\n"
+    letters_space = ""
+    for i in range(0, len(word)):
+        letters_space+="_ "
+    letters_space+="\n"
+    instruction = "Ingresa una letra: "
+
+    print(title+letters_space+instruction)
+
 def run():
-    print(get_random_word())
+    generate_scene(get_random_word())
 
 if __name__ == '__main__':
     run()
