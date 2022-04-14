@@ -1,4 +1,20 @@
 from random import choice
+import os
+
+GUESSED_WORD=""
+USED_LETTERS=[]
+
+def normalize(word):
+    replacements = (
+            ("á", "a"),
+            ("é", "e"),
+            ("í", "i"),
+            ("ó", "o"),
+            ("ú", "u"),
+        )
+    for a, b in replacements:
+        word = word.replace(a, b).replace(a.upper(), b.upper())
+    return word
 
 def get_words():
     words = []
@@ -10,18 +26,37 @@ def get_random_word():
     word = choice(get_words())
     return word
 
-def generate_scene(word):
-    title = "¡Adivina la palabra!\n"
-    letters_space = ""
+def generate_guessed_word(word, letter):
+    GUESSED_WORD=""
     for i in range(0, len(word)):
-        letters_space+="_ "
+        if letter == word[i]:
+            GUESSED_WORD+=letter+" "
+        else:
+            GUESSED_WORD+="_ "
+    return GUESSED_WORD
+
+def generate_scene(word, letter):
+    title = "¡Adivina la palabra!\n"
+    letters_space = generate_guessed_word(word, letter)
     letters_space+="\n"
     instruction = "Ingresa una letra: "
 
-    print(title+letters_space+instruction)
+    return title+letters_space+instruction
 
 def run():
-    generate_scene(get_random_word())
+    game_word = normalize(get_random_word()).upper()
+
+    game_word=game_word.upper()
+
+    scene = generate_scene(game_word, "o".upper())
+
+    print(scene)
+
+    scene = generate_scene(game_word, "l".upper())
+
+    print(scene)
+
+
 
 if __name__ == '__main__':
     run()
