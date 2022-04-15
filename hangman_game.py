@@ -1,9 +1,6 @@
 from random import choice
 import os
 
-GUESSED_WORD=""
-USED_LETTERS=[]
-
 def normalize(word):
     replacements = (
             ("á", "a"),
@@ -16,46 +13,55 @@ def normalize(word):
         word = word.replace(a, b).replace(a.upper(), b.upper())
     return word
 
+
 def get_words():
     words = []
     with open("./files/data.txt", "r", encoding="utf-8") as f:
         words = [line.rstrip('\n') for line in f]
     return words
 
+
 def get_random_word():
     word = choice(get_words())
     return word
 
-def generate_guessed_word(word, letter):
-    GUESSED_WORD=""
-    for i in range(0, len(word)):
-        if letter == word[i]:
-            GUESSED_WORD+=letter+" "
-        else:
-            GUESSED_WORD+="_ "
-    return GUESSED_WORD
 
-def generate_scene(word, letter):
-    title = "¡Adivina la palabra!\n"
-    letters_space = generate_guessed_word(word, letter)
-    letters_space+="\n"
-    instruction = "Ingresa una letra: "
+def judge(guess_right):
+    if guess_right:
+        print("Acertaste la letra!")
+    else:
+        print("La letra que introduciste fue incorrecta :c")
 
-    return title+letters_space+instruction
+
+def check_guess(word_l, guessed_l, input_letter):
+    guessed_right=False
+    for i in range(0, len(word_l)):
+        if input_letter == word_l[i]:
+            guessed_l[i] = input_letter
+            guessed_right=True
+
+    judge(guessed_right)
+    return guessed_l
+
 
 def run():
     game_word = normalize(get_random_word()).upper()
+    #game_word = "Hola".upper()
+    used_letters=[]
+    word_l = [i for i in game_word]
+    guessed_l = ["_" for i in word_l]
 
-    game_word=game_word.upper()
+    print(guessed_l)
+    while True:
+        input_letter = input("Ingresa una letra: ").upper()
+        guessed_l = check_guess(word_l, guessed_l, input_letter)
 
-    scene = generate_scene(game_word, "o".upper())
+        print(guessed_l)
 
-    print(scene)
-
-    scene = generate_scene(game_word, "l".upper())
-
-    print(scene)
-
+        if guessed_l == word_l:
+            print("Ganaste!!!!")
+            break
+        
 
 
 if __name__ == '__main__':
