@@ -26,12 +26,13 @@ def get_random_word():
     return word
 
 
-def judge(guess_right):
+def judge(guess_right, lives):
     if guess_right:
-        print("Acertaste la letra!")
+        print("\nAcertaste una letra!")
     else:
-        print("La letra que introduciste fue incorrecta :c")
-
+        print("\nLa letra que introduciste fue incorrecta :c")
+        lives-=1
+    return lives
 
 def check_guess(word_l, guessed_l, input_letter):
     guessed_right=False
@@ -40,27 +41,50 @@ def check_guess(word_l, guessed_l, input_letter):
             guessed_l[i] = input_letter
             guessed_right=True
 
-    judge(guessed_right)
-    return guessed_l
+    return guessed_l, guessed_right
 
 
 def run():
+
+    # Game variables
     game_word = normalize(get_random_word()).upper()
     #game_word = "Hola".upper()
+    lives = 6
     used_letters=[]
     word_l = [i for i in game_word]
     guessed_l = ["_" for i in word_l]
+    guessed_right=True
 
-    print(guessed_l)
+    # First print format
+    os.system("cls")
+    word = ""
+    for letter in guessed_l:
+        word+=letter+" "
+    print(word+"\n"+
+        "\nTe quedan {lives} vidas".format(lives=lives))
+
     while True:
-        input_letter = input("Ingresa una letra: ").upper()
-        guessed_l = check_guess(word_l, guessed_l, input_letter)
-
-        print(guessed_l)
+        input_letter = input("\nIngresa una letra: ").upper()
+        guessed_l, guessed_right = check_guess(word_l, guessed_l, input_letter)
+        os.system("cls")
+        word = ""
+        for letter in guessed_l:
+            word+=letter+" "
+        print(word+"\n"+
+            "\nTe quedan {lives} vidas".format(lives=lives))
 
         if guessed_l == word_l:
-            print("Ganaste!!!!")
+            print("\nFelicidades Ganaste!!!!")
             break
+
+        if lives == 0:
+            print("\nLo sentimos haz perdido :C"+
+                "\nLa palabra era: "+ game_word+
+                "\nTerminó el juego")
+            input()
+            break
+        
+        lives = judge(guessed_right, lives)
         
 
 
