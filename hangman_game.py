@@ -1,6 +1,58 @@
 from random import choice
 import os
 
+HANGMANPICS = ['''
+  +---+
+  |   |
+      |
+      |
+      |
+      |
+=========''', '''
+  +---+
+  |   |
+  O   |
+      |
+      |
+      |
+=========''', '''
+  +---+
+  |   |
+  O   |
+  |   |
+      |
+      |
+=========''', '''
+  +---+
+  |   |
+  O   |
+ /|   |
+      |
+      |
+=========''', '''
+  +---+
+  |   |
+  O   |
+ /|\  |
+      |
+      |
+=========''', '''
+  +---+
+  |   |
+  O   |
+ /|\  |
+ /    |
+      |
+=========''', '''
+  +---+
+  |   |
+  O   |
+ /|\  |
+ / \  |
+      |
+=========''']
+
+
 def normalize(word):
     replacements = (
             ("á", "a"),
@@ -26,13 +78,56 @@ def get_random_word():
     return word
 
 
-def judge(guess_right, lives):
-    if guess_right:
-        print("\nAcertaste una letra!")
+def print_scene(var_dict):
+    os.system("cls")
+    used_letter_msj=""
+    guessed_right_msj=""
+    word=""
+    scene_str=""
+
+    hangman_pics = HANGMANPICS[::-1]
+
+    hanged_man=hangman_pics[var_dict.get("lives")]
+
+    scene_str+=hanged_man+"\n"
+
+    #To create message if letter is already used
+    if var_dict.get("used_already"):
+        used_letter_msj="Ya utilizaste esta letra, vuelve a intentar\n"
+        scene_str+=used_letter_msj
+
+    #To create message if the letter was guessed right or not
+    if var_dict.get("guessed_right") == None:
+        guessed_right_msj=""
+    elif var_dict.get("guessed_right"):
+        guessed_right_msj="¡Acertaste una letra!\n"
     else:
-        print("\nLa letra que introduciste fue incorrecta :c")
-        lives-=1
-    return lives
+        guessed_right_msj="Mala suerte, la letra no era correcta :C\n"
+    scene_str+=guessed_right_msj
+
+    #Making the word with spaces
+    for letter in var_dict.get("guessed_l"):
+        word+=letter+" "
+    scene_str+=word
+
+    scene_str+=f"""
+
+Te quedan {var_dict.get("lives")} vidas
+"""
+
+    if not (var_dict.get("guessed_l") == var_dict.get("word_l") or var_dict.get("lives") == 0):
+        scene_str+="\nIngresa una letra"
+
+    if var_dict.get("guessed_l") == var_dict.get("word_l"):
+        scene_str+="\nFelicidades Ganaste!!!!"
+
+    if var_dict.get("lives") == 0:
+        scene_str+=f"""\nLo sentimos haz perdido :C 
+La palabra era: {var_dict.get("game_word")}
+Terminó el juego"""
+    
+    print(scene_str)
+
 
 def check_guess(word_l, guessed_l, input_letter):
     guessed_right=False
@@ -54,39 +149,42 @@ def run():
     word_l = [i for i in game_word]
     guessed_l = ["_" for i in word_l]
     guessed_right=True
+    scene_dict={
+        "lives": lives,
+        "game_word": game_word,
+        "guessed_l": guessed_l,
+        "word_l": word_l,
+        "used_letters": used_letters,
+        "used_already": False
+    }
 
     # First print format
-    os.system("cls")
-    word = ""
-    for letter in guessed_l:
-        word+=letter+" "
-    print(word+"\n"+
-        "\nTe quedan {lives} vidas".format(lives=lives))
+    print_scene(scene_dict)
 
     while True:
-        input_letter = input("\nIngresa una letra: ").upper()
+        input_letter = input("").upper()
+        scene_dict["input_letter"] = input_letter
+        if input_letter in used_letters:
+            scene_dict["used_already"] = True
+        else:
+            scene_dict["used_already"] = False
+            used_letters.append(input_letter)
         guessed_l, guessed_right = check_guess(word_l, guessed_l, input_letter)
-        os.system("cls")
+        scene_dict["guessed_l"] = guessed_l
+        scene_dict["guessed_right"] = guessed_right
         word = ""
         for letter in guessed_l:
             word+=letter+" "
-        print(word+"\n"+
-            "\nTe quedan {lives} vidas".format(lives=lives))
+        if not guessed_right:
+            lives-=1
+            scene_dict["lives"]=lives
 
-        if guessed_l == word_l:
-            print("\nFelicidades Ganaste!!!!")
-            break
+        print_scene(scene_dict)
 
-        if lives == 0:
-            print("\nLo sentimos haz perdido :C"+
-                "\nLa palabra era: "+ game_word+
-                "\nTerminó el juego")
+        if guessed_l == word_l or lives == 0:
             input()
             break
         
-        lives = judge(guessed_right, lives)
-        
-
 
 if __name__ == '__main__':
     run()
