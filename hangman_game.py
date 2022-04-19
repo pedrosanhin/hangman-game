@@ -91,10 +91,18 @@ def print_scene(var_dict):
 
     scene_str+=hanged_man+"\n"
 
+    #Making the word with spaces
+    for letter in var_dict.get("guessed_l"):
+        word+=letter+" "
+    scene_str+=word+"\n"
+
     #To create message if letter is already used
     if var_dict.get("used_already"):
         used_letter_msj="Ya utilizaste esta letra, vuelve a intentar\n"
         scene_str+=used_letter_msj
+
+    #To create an error message if input_letter was not valid
+        scene_str+=var_dict.get("error")+"\n"
 
     #To create message if the letter was guessed right or not
     if var_dict.get("guessed_right") == None:
@@ -105,15 +113,8 @@ def print_scene(var_dict):
         guessed_right_msj="Mala suerte, la letra no era correcta :C\n"
     scene_str+=guessed_right_msj
 
-    #Making the word with spaces
-    for letter in var_dict.get("guessed_l"):
-        word+=letter+" "
-    scene_str+=word
-
-    scene_str+=f"""
-
-Te quedan {var_dict.get("lives")} vidas
-"""
+    # Lives counter
+    scene_str+=f"""Vidas: {var_dict.get("lives")}\n"""
 
     if not (var_dict.get("guessed_l") == var_dict.get("word_l") or var_dict.get("lives") == 0):
         scene_str+="\nIngresa una letra"
@@ -155,14 +156,23 @@ def run():
         "guessed_l": guessed_l,
         "word_l": word_l,
         "used_letters": used_letters,
-        "used_already": False
+        "used_already": False,
     }
 
     # First print format
     print_scene(scene_dict)
 
     while True:
-        input_letter = input("").upper()
+        try:
+            input_letter = input("").upper()
+            if input_letter.isdigit():
+                raise ValueError("No puedes ingresar valores numéricos, solo letras")
+            if len(input_letter)!=1:
+                raise ValueError("Solo puedes ingresar una letra")
+            scene_dict["error"]=None
+        except ValueError as ve:
+            scene_dict["error"] = str(ve)
+
         scene_dict["input_letter"] = input_letter
         if input_letter in used_letters:
             scene_dict["used_already"] = True
